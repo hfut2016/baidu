@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+
+    "name": "汉典划词查询",
+    "description": "在任何页面用汉典划词查询的工具，文学爱好者不可或缺的利器！",
+    "version": "1.2.4",
+    "icons": {
+        "16": "baidu32.png",
+        "48": "baidu128.png",
+        "128": "baidu128.png"
+    },
+
+    "content_scripts": [{
+        "matches": ["http://*/*","https://*/*"],
+        "js": ["contentScript.js"],
+        "run_at": "document_end"
+    }],
+   "background": {
+    "scripts": [
+      "backgroundScript.js"
+    ]
+  },
+    "permissions": [
+        "http://*.zdic.net/",
+		"http://*.baidu.com/",
+        "activeTab",
+        "storage"
+    ],
+    "browser_action": {
+        "default_icon": "baidu32.png",
+        "default_popup": "popup.html"
+    }
+}
