@@ -1,30 +1,65 @@
-let serchNewsUrl = `https://www.baidu.com/s?rtt=1&bsst=1&cl=2&tn=news&rsv_dl=ns_pc&word=` ;
-let serchPageUrl =`https://www.baidu.com/s?ie=utf-8&f=8&wd=`;
-let nowUrl = serchPageUrl; 
+// let serchNewsUrl = `https://www.baidu.com/s?rtt=1&bsst=1&cl=2&tn=news&rsv_dl=ns_pc&word=` ;
+let nowUrl =`https://www.baidu.com/s?ie=utf-8&f=8&wd=`;
+let serchPageUrl = true; 
 chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
 	console.log(request)
+	chrome.storage.sync.get('searchUrl', function(result) {
+		// console.log(result);
+		serchPageUrl = result.searchUrl;
+		})
+	let responseHtml = `
+	<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div class="kw" style=" text-align:left; display:flex; font-size:small;	font-weight:100;"><p id="result_kw"></p></div>
+  <div class="kw" style=" text-align: left; display: flex;border: 1px solid skyblue; font-size:small;	font-weight:100;"><p id="result_qs"></p></div>
+  <div class="answer" style="text-align: left; font-size:small;	font-weight:500; border: 1px solid skyblue;"></div>
+</body>
+</html>`
 	chrome.storage.sync.get('enabled', function(result) {  
 		let responseData = '';
 		// console.log(result)
-		if (result.enabled){
+		if (!result.enabled){
+			sendResponse({result: responseData, status:'stop'});
+		} else if (serchPageUrl){
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", nowUrl + request.selected, true);
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
 					responseData = checkHtml(xhr.responseText);
-					sendResponse({result: responseData, status:false});
+					sendResponse({result: responseData, status:'search'});
 					}
 			}
 			xhr.send();
 		} else {
-			sendResponse({result: responseData, status:true});
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", 'http://127.0.0.1:8888/?kw=' + request.selected, true);
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					responseData = JSON.parse(xhr.responseText);
+					myHtml = responseHtml.replace(/id="result_kw">/,`id="result_kw">${responseData.kw}`);
+					myHtml = myHtml.replace(/id="result_qs">/,`id="result_qs">${responseData.question}`);
+					let temp = ``
+					if (responseData.answer.length > 0){
+						responseData.answer.forEach(item => {
+						temp = `${temp}<p>${item.option}：${item.value}</p>`;
+						});
+						myHtml = myHtml.replace(/skyblue;"><\/div>/,`skyblue;">${temp}</div>`);
+					}
+					console.log(responseData)
+					sendResponse({result: myHtml, status:'copy'});
+					}
+			}
+			xhr.send();
 		}
 	});
-	// chrome.storage.sync.get('searchUrl', function(result) {
-		// console.log(result);
-		// nowUrl = result.searchUrl ? serchPageUrl : serchNewsUrl ;
-	  // })
  });
  
  function checkHtml(html) {
@@ -39,7 +74,7 @@ chrome.extension.onRequest.addListener(
  }
  
  var myButton = `<p id="result_logo" onmousedown="return c({'fm':'tab','tab':'logo'})">
-	<input class="index-logo-src" id="copy-btn" type="button" value="一键复制" title="点击复制到剪贴版">
+	<input class="index-logo-src" style="height: 40px;" id="copy-btn" type="button" value="一键复制" title="点击复制到剪贴版">
 	<input class="index-logo-srcnew" type="button" value="到百度首页" title="到百度2首页"></p>`
  
  var insertScript = `));</script><script type="text/javascript" data-for="result">
@@ -51,4 +86,5 @@ chrome.extension.onRequest.addListener(
 	var iframeLoad = function(){
 		document.getElementById("copy-btn").setAttribute("onclick","copyToTipe(this)")}
 	</script></head><body link="#0000cc" onload="iframeLoad()">`
-  
+
+

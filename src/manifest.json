@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
 
-    "name": "汉典划词查询",
-    "description": "在任何页面用汉典划词查询的工具，文学爱好者不可或缺的利器！",
-    "version": "1.2.4",
+    "name": "右键百度查询",
+    "description": "在任何页面用右键划词查询的工具，破解网页不可或缺的利器！",
+    "version": "6.6.6",
     "icons": {
         "16": "baidu32.png",
         "48": "baidu128.png",
@@ -23,6 +23,7 @@
     "permissions": [
         "http://*.zdic.net/",
 		"http://*.baidu.com/",
+		"http://127.0.0.1:8888/",
         "activeTab",
         "storage"
     ],
