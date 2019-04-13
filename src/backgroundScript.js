@@ -19,8 +19,8 @@ chrome.extension.onRequest.addListener(
 </head>
 <body>
   <div class="kw" style=" text-align:left; display:flex; font-size:small;	font-weight:100;"><p id="result_kw"></p></div>
-  <div class="kw" style=" text-align: left; display: flex;border: 1px solid skyblue; font-size:small;	font-weight:100;"><p id="result_qs"></p></div>
-  <div class="answer" style="text-align: left; font-size:small;	font-weight:500; border: 1px solid skyblue;"></div>
+  <div class="kw" style=" text-align: left; display: flex; color:springgreen; border: 1px solid skyblue; font-size:small;	font-weight:100;"><p id="result_qs"></p></div>
+  <div class="answer" style="text-align: left; color:dodgerblue; font-size:small;	font-weight:800; border: 1px solid skyblue;"></div>
 </body>
 </html>`
 	chrome.storage.sync.get('enabled', function(result) {  
