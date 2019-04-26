@@ -20,7 +20,7 @@ chrome.extension.onRequest.addListener(
 <body>
   <div class="kw" style=" text-align:left; display:flex; font-size:small;	font-weight:100;"><p id="result_kw"></p></div>
   <div class="kw" style=" text-align: left; display: flex; color:springgreen; border: 1px solid skyblue; font-size:small;	font-weight:100;"><p id="result_qs"></p></div>
-  <div class="answer" style="text-align: left; color:dodgerblue; font-size:small;	font-weight:800; border: 1px solid skyblue;"></div>
+  <div class="answer" style="text-align: left; color:dodgerblue; border: 1px solid skyblue;	font-weight:800; font-size:small;"></div>
 </body>
 </html>`
 	chrome.storage.sync.get('enabled', function(result) {  
@@ -40,22 +40,28 @@ chrome.extension.onRequest.addListener(
 			xhr.send();
 		} else {
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", 'http://127.0.0.1:8888/?kw=' + request.selected, true);
+			xhr.open("GET", 'http://127.0.0.1:10086/?kw=' + request.selected, true);
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
-					responseData = JSON.parse(xhr.responseText);
-					myHtml = responseHtml.replace(/id="result_kw">/,`id="result_kw">${responseData.kw}`);
-					myHtml = myHtml.replace(/id="result_qs">/,`id="result_qs">${responseData.question}`);
-					let temp = ``
-					if (responseData.answer.length > 0){
-						responseData.answer.forEach(item => {
-						temp = `${temp}<p>${item.option}：${item.value}</p>`;
-						});
-						myHtml = myHtml.replace(/skyblue;"><\/div>/,`skyblue;">${temp}</div>`);
+					if(xhr.status>=200&&xhr.status<300  ||  xhr.status==304){
+						responseData = JSON.parse(xhr.responseText);
+						myHtml = responseHtml.replace(/id="result_kw">/,`id="result_kw">${responseData.kw}`);
+						myHtml = myHtml.replace(/id="result_qs">/,`id="result_qs">${responseData.question}`);
+						let temp = ``
+						if (responseData.answer.length > 0){
+							responseData.answer.forEach(item => {
+							temp = `${temp}<p>${item.option}：${item.value}</p>`;
+							});
+							myHtml = myHtml.replace(/font-size:small;"><\/div>/,`font-size:small;">${temp}</div>`);
+						}
+						console.log(responseData)
+						sendResponse({result: myHtml, status:'copy'});
+					} else {
+						myHtml = responseHtml.replace(/id="result_kw">/,`id="result_kw">${request.selected}`);
+						myHtml = myHtml.replace(/font-size:small;"><\/div>/,`font-size:larger;">请运行本地服务器程序</div>`);
+						sendResponse({result: myHtml, status:'copy'});
 					}
-					console.log(responseData)
-					sendResponse({result: myHtml, status:'copy'});
-					}
+				}
 			}
 			xhr.send();
 		}

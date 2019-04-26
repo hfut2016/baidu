@@ -1,43 +1,40 @@
 
-document.body.oncontextmenu = e => {
-	inserScript(e);
-	//console.log(`右键模式`);
-  return true;
-    // e.preventDefault();
+document.body.oncontextmenu = eStart => {
+	return true;
+	// e.preventDefault();
 }
 
-document.body.onmouseup = e => {
+document.body.onmousedown = eStart => {
 	//console.log(`划线模式`);
-	inserScript(e);
+	document.body.onmouseup = eStop =>{
+		let diffX = eStart.pageX-eStop.pageX;
+		let diffY = eStart.pageY-eStop.pageY;
+		// console.log(`start位置x: ${eStart.pageX-eStop.pageX}px; y: ${eStart.pageY-eStop.pageY}px \n
+		// stop位置x: ${eStop.pageX}px  y: ${eStop.pageY}px`);
+		if (Math.abs(diffX)>2 | Math.abs(diffY)>2){
+			inserScript(eStop);
+		} else if(!window.getSelection().toString()){
+			removeCopy();
+		}
+	}
+	
 	return true;
 	// e.preventDefault();
 };
 
 var inserScript = function(e){
-	if(window.getSelection().toString()){
-		let location = window.getSelection().getRangeAt(0).getBoundingClientRect();
-		`bottom: 361	height: 14	left: 475.5	right: 595.5	top: 347	width: 120	x: 475.5	y: 347`
-		//console.log('选中内容=>',window.getSelection().toString())
-		chrome.extension.sendRequest({
-			selected:window.getSelection().toString()
-			}, 
-			function(response) {
-				if (response.status === 'stop'){
-					//console.log("插件未启用")
-				}else if (response.status === 'copy'){
-					copyPage(response,location);
-				} else {
-					baiduPage(response);
-				}
-		})	
-	} else if (!window.getSelection().toString()){
-		//console.log('未选中的文本');
-		let node_data = document.getElementById("baidu-result");
-		if(node_data){
-			//console.log('即将移除元素',node_data.id);
-			document.body.removeChild(node_data);
-		};	
-	};
+	chrome.extension.sendRequest({
+		selected:window.getSelection().toString()
+		}, 
+		function(response) {
+			if (response.status === 'stop'){
+				//console.log("插件未启用")
+			}else if (response.status === 'copy'){
+				copyPage(response,e.pageX, e.pageY);
+			} else {
+				baiduPage(response);
+			}
+	})	
 }
 
 var baiduPage = function(response){
@@ -49,7 +46,7 @@ var baiduPage = function(response){
 	document.body.appendChild(iframe);
 }
 
-var copyPage = function(response,location){
+var copyPage = function(response,x,y){
 	removeCopy();
 	// let x = location.right < 800 ? location.right + 20 : location.left + 250;
 	// let y = location.top < 200 ? location.top + 20 : location.top - 66;
