@@ -28,9 +28,9 @@ function updateHtml() {
     document.getElementById('enableVal').innerHTML = gb.enabled ? '已' : '未';
     document.getElementById('selectBtn').className = gb.searchUrl ?
             'enabled' : 'disabled';
-    document.getElementById('selectBtn').innerHTML = gb.searchUrl ? '百度' : '复制';
+    document.getElementById('selectBtn').innerHTML = gb.searchUrl ? '百度' : '题库';
     chrome.browserAction.setIcon({
-        path: 'handian48' + (gb.enabled ? '' : '-disabled') + '.png'
+        path: 'baidu128' + (gb.enabled ? '' : '-disabled') + '.png'
     });
 }
 

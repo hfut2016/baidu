@@ -28,7 +28,7 @@
         "storage"
     ],
     "browser_action": {
-        "default_icon": "baidu32.png",
+        "default_icon": "baidu128-disabled.png",
         "default_popup": "popup.html"
     }
 }
